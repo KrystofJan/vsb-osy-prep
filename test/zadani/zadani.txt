@@ -1,0 +1,45 @@
+C++ Reference: http://poli.cs.vsb.cz/edu/osy
+
+Server přijme požadavek na vytvoření obrázku hodin pro čas. 
+Klient odešle požadavek TIME HH:MM [SIZE WIDTHxHEIGHT]. Přijatá data uloží do souboru.
+--------------------------------------------------
+Upravte soketový server tak, aby od klienta přijal požadavek ve tvaru "TIME HH:MM", 
+případně "TIME HH:MM SIZE WIDTHxHEIGHT"
+Pro každého připojeného klienta si server vytvoří nový proces.
+
+    - vytvoření nového procesu (za accept) pro nové spojení. Kód potomka v samostatné funkci!
+    - proces potomka nepotřebuje poll!
+    - přijme požadavek a rozloží si ho na HH, MM a případně i WIDTH a HEIGTH. 
+    - sprintf a sscanf jsou dobří pomocníci!
+    - při špatném požadavku se ukončí.
+    - vytvoří si argumenty pro program convert:
+      "convert img/ring.png img/hour0940.png img/minute42.png -layers flatten out.png",
+    nebo
+      "convert img/ring.png img/hour0940.png img/minute42.png -layers flatten -resize 400x300! out.png"
+    - vytvoření procesu pro příkaz "convert".
+    - použijte "fork, exec a wait". Ne "system" či "/bin/sh". 
+    - otevření souboru "out.png" a pomalé odeslání (cca 10 s.) klientovi. 
+    - semaforem je potřeba zajistit, aby generování a odesílání obrázku probíhalo 
+      v jediném procesu. 
+
+Upravte soketového klienta tak, aby odeslal zadaný požadavek a přijatá data uložil do souboru. 
+
+    - navázání spojení se serverem.
+    - klient nepotřebuje poll!
+    - připravení příkazu "TIME ... SIZE ... ". Hodnoty z argumentů program, nebo ze stdin. 
+    - klient čeká na data od serveru a ta ukládá do souboru "time.png"
+    - klient na požádání může navazovat spojení se serverem opakovaně každou minutu a
+      požádá o obrázek pro aktuální čas. 
+
+Zobrazení obrázku pomocí "display -update 1 time.png &"
+
+--------------------------------------------------
+Minimum: odeslání požadavku TIME, vytvoření obrázku, odeslání obrázku klientovi a uložení. 
+Fungující semafor. Kód potomka v samostatné funkci. Obrázek 1500x1000 (pevná velikost)
+
+Pro plný počet bodů: pomalé odesílání dat, požadavek včetně SIZE, 
+automatická opakovaná žádost o čas.
+
+
+
+

@@ -11,3 +11,5 @@ Internetový prohlížeč zašle na sever příkaz: "ls -la /etc" ve tvaru "http
 ## RemoteShell
 Remote shell. Podobně jako předchozí příklad, jen příkaz bude zadán z textového klienta, na serveru interpretován a výstup přesměrován do soketu. Přijatá data klient zobrazí i uloží do souboru.
 
+## Test
+In test/zadani/zadani.txt
