@@ -31,12 +31,14 @@
 #include <semaphore.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <string>
 
 
 #define STR_CLOSE   "close"
 #define STR_QUIT    "quit"
 #define WAIT_TIME   10
 #define OUTPUT_PATH "out.png"
+#define SEM_NAME "/my_sem"
 
 //***************************************************************************
 // log messages
@@ -47,7 +49,7 @@
 
 // debug flag
 
-sem_t my_sem;
+sem_t *my_sem = nullptr;
 
 int g_debug = LOG_INFO;
 
@@ -84,6 +86,8 @@ void log_msg( int t_log_level, const char *t_form, ... )
 
 void handleClient(int socket);
 void handleConvert(int socket, std::vector<char*> args);
+std::string handleInput(int* hours, int *minutes);
+
 void help( int t_narg, char **t_args )
 {
     if ( t_narg <= 1 || !strcmp( t_args[ 1 ], "-h" ) )
@@ -116,7 +120,16 @@ int main( int t_narg, char **t_args )
     int l_port = 0;
 
 
-    sem_init(&my_sem, 1, 1);
+    my_sem = sem_open( SEM_NAME, O_RDWR );
+
+    if(!my_sem){
+        my_sem = sem_open(SEM_NAME, O_CREAT | O_RDWR, 0660, 1);
+        if ( !my_sem)
+        {
+            log_msg( LOG_ERROR, "Unable to create two semaphores!" );
+            return 1;
+        }
+    }
 
     // parsing arguments
     for ( int i = 1; i < t_narg; i++ )
@@ -131,6 +144,13 @@ int main( int t_narg, char **t_args )
         {
             l_port = atoi( t_args[ i ] );
             break;
+        }
+    
+        if ( !strcmp( t_args[ i ], "-r" ) )
+        {
+            log_msg( LOG_INFO, "Clean semaphores." );
+            sem_unlink( SEM_NAME );
+            exit( 0 );
         }
     }
 
@@ -275,15 +295,18 @@ void handleClient(int socket){
 
         sscanf(buf, "%d:%d %d %d", &hour, &minute, &width, &height);
 
-        // todo parse hours
+        char hour_buf[4];
+        int desc = ((hour * 100) + ((minute/10) * 10))%1200;
 
         char arg_buf[64];
         if (width > 0 && height > 0){
-            sprintf(arg_buf, "convert img/ring.png img/hour%d.png img/minute%d.png -layers flatten -resize %dx%d! out.png", hour, minute, width, height);
+            sprintf(arg_buf, "convert img/ring.png img/%04d.png img/minute%d.png -layers flatten -resize %dx%d! -colorspace Gray out.png", desc, minute, width, height);
         }
         else{
-            sprintf(arg_buf, "convert img/ring.png img/hour%d.png img/minute%d.png -layers flatten out.png", hour, minute);
+            sprintf(arg_buf, "convert img/ring.png img/hour%04d.png img/minute%d.png -layers flatten -colorspace Gray out.png", desc, minute);
         }
+
+        log_msg(LOG_INFO, arg_buf);
 
         std::vector<char*> args;
         char* token = strtok(arg_buf, " ");
@@ -293,23 +316,18 @@ void handleClient(int socket){
             token = strtok(NULL, " ");
         }     
 
+        sem_wait(my_sem);
+
         if (fork() == 0){
-            sem_wait(&my_sem);
             handleConvert(socket, args);
         }
-
-        log_msg(LOG_INFO, "display\n");
-
-        // execl("display", "-update" , "1" , "time.png", "&", nullptr);
-        
-        log_msg(LOG_INFO, "wait\n");
 
         int secs = 0;
         struct stat fileStat;
         if(stat("out.png", &fileStat) == 0){
             log_msg(LOG_ERROR, "SOUBOR NENI");
         }
-        int file_size = fileStat.st_size;
+        int file_size = fileStat.st_size + 100;
         
         log_msg(LOG_INFO, "%d\n", file_size);
         
@@ -321,15 +339,19 @@ void handleClient(int socket){
             log_msg( LOG_ERROR, "FILE OPEN FAILED" );
             exit(0);
         }
+
         log_msg(LOG_INFO, "%d\n", file_len);    
+        log_msg(LOG_INFO, bytes);
 
         int davka_len = (int)((float)file_len / 10);
         int index = 0;
 
+        log_msg(LOG_INFO, "%d\n", davka_len);    
 
+    
         while(secs < WAIT_TIME){
-            char davka[davka_len];
-            for(int i = 0; i < davka_len; i++){
+            char davka[1800];
+            for(int i = index; i < index+davka_len; i++){
                 davka[i] = bytes[i];
             }
 
@@ -337,12 +359,21 @@ void handleClient(int socket){
 
             index+=davka_len;
 
-            log_msg(LOG_INFO, "%d%\n", secs+1);
+            log_msg(LOG_INFO, "%d%\n", secs+1 * 10);
             secs++;
             sleep(1);
         }
 
-        sem_post(&my_sem);
+        sem_post(my_sem);
+
+
+        if (fork() == 0){
+            log_msg(LOG_INFO, "Disp the picture\n");
+
+            execl("display", "-update" , "1" , "out.png", "&", nullptr);
+            exit(2);
+        }
+
     }
 }
 
@@ -352,14 +383,17 @@ void handleConvert(int socket, std::vector<char*> args){
     int arg_len = args.size();
     argv[arg_len] = nullptr;
 
-    log_msg(LOG_INFO, "semaphore waiting\n");
-    
-
-    log_msg(LOG_INFO, "convert\n");
+    log_msg(LOG_INFO, "Made the picture\n");
     
     int convert_len = execvp(argv[0], argv);
     if ( convert_len < 0 ){
         log_msg( LOG_ERROR, "Exec failed" );
         exit(0);
     }
+}
+
+std::string handleInput(int hours, int minutes){
+    int desc = (minutes/10) * 10;
+    // sprintf()
+    return "hey";
 }

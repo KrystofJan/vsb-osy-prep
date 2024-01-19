@@ -207,13 +207,14 @@ void handle(int socket){
 
         while(1){              
 
-            char file_data[8420];
+            char file_data[1800];
             int file_ee = read(socket, file_data,sizeof(file_data));
 
             if (file_ee <= 0){
                 log_msg(LOG_ERROR, "Nelze cist ze serveru!");
                 break;
             }
+                log_msg(LOG_ERROR, file_data);
 
             write(fd, file_data, file_ee);
         }
