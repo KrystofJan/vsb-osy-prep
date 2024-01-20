@@ -377,7 +377,7 @@ void sendData(int socket){
             log_msg(LOG_ERROR, "SOUBOR NENI");
             exit(2);
         }
-        int file_size = fileStat.st_size + 100;
+        int file_size = fileStat.st_size + 1;
         
         char bytes[file_size];
         int file_len = read(out_fd, bytes, sizeof(bytes));
@@ -385,30 +385,32 @@ void sendData(int socket){
             log_msg( LOG_ERROR, "FILE OPEN FAILED" );
             exit(0);
         }
+        bytes[file_size] = 0;
+        write(socket, bytes, strlen(bytes));
 
-        log_msg(LOG_INFO, "File len%d\n", file_len);    
-        log_msg(LOG_INFO, bytes);
+        // log_msg(LOG_INFO, "File len%d\n", file_len);    
+        // log_msg(LOG_INFO, bytes);
 
-        int davka_len = (int)((float)file_len / 10);
-        int index = 0;
+//         int davka_len = (int)((float)file_len / 10);
+//         int index = 0;
 
-        log_msg(LOG_INFO, "davka: %d", davka_len);    
+//         log_msg(LOG_INFO, "davka: %d", davka_len);    
 
     
-        while(secs < WAIT_TIME){
-            char davka[davka_len];
-            for(int i = 0; i < davka_len; i++){
-                davka[i] = bytes[index + i];
-            }
-            davka[davka_len] = 0;
-            log_msg(LOG_INFO, davka);
+//         while(secs < WAIT_TIME){
+//             char davka[davka_len];
+//             for(int i = 0; i < davka_len; i++){
+//                 davka[i] = bytes[index + i];
+//             }
+//             davka[davka_len] = 0;
+//             log_msg(LOG_INFO, davka);
 
-            write(socket, davka, strlen(davka));
+//             write(socket, davka, strlen(davka));
 
-            index+=davka_len;
+//             index+=davka_len;
 
-            log_msg(LOG_INFO, "%d%\n", (secs+1) * 10);
-            secs++;
-            sleep(1);
-        }
+//             log_msg(LOG_INFO, "%d%\n", (secs+1) * 10);
+//             secs++;
+//             sleep(1);
+//         }
 }
