@@ -200,7 +200,7 @@ void handle(int socket){
         int len_out = read(socket,buf_out, sizeof(buf_out));
 
         if (len_out < 0){
-                log_msg(LOG_ERROR, "Nelze cist ze serveru!");
+            log_msg(LOG_ERROR, "Nelze cist ze serveru!");
         }
         
         int fd = open("result.png", O_WRONLY | O_CREAT, 0666);
@@ -214,7 +214,8 @@ void handle(int socket){
                 log_msg(LOG_ERROR, "Nelze cist ze serveru!");
                 break;
             }
-                log_msg(LOG_ERROR, file_data);
+
+            log_msg(LOG_INFO, file_data);
 
             write(fd, file_data, file_ee);
         }

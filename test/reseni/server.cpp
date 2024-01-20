@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string>
-
+#include <sys/wait.h>
 
 #define STR_CLOSE   "close"
 #define STR_QUIT    "quit"
@@ -87,6 +87,9 @@ void log_msg( int t_log_level, const char *t_form, ... )
 void handleClient(int socket);
 void handleConvert(int socket, std::vector<char*> args);
 std::string handleInput(int* hours, int *minutes);
+
+
+void sendData(int socket);
 
 void help( int t_narg, char **t_args )
 {
@@ -320,59 +323,24 @@ void handleClient(int socket){
 
         if (fork() == 0){
             handleConvert(socket, args);
+            exit(1);
         }
 
-        int secs = 0;
-        struct stat fileStat;
-        if(stat("out.png", &fileStat) == 0){
-            log_msg(LOG_ERROR, "SOUBOR NENI");
-        }
-        int file_size = fileStat.st_size + 100;
-        
-        log_msg(LOG_INFO, "%d\n", file_size);
-        
-        char bytes[file_size];
-        int out_fd = open("out.png", O_RDONLY);
+        wait(NULL);
 
-        int file_len = read(out_fd, bytes, sizeof(bytes));
-        if ( file_len < 0 ){
-            log_msg( LOG_ERROR, "FILE OPEN FAILED" );
-            exit(0);
-        }
+        sendData(socket);
 
-        log_msg(LOG_INFO, "%d\n", file_len);    
-        log_msg(LOG_INFO, bytes);
-
-        int davka_len = (int)((float)file_len / 10);
-        int index = 0;
-
-        log_msg(LOG_INFO, "%d\n", davka_len);    
-
-    
-        while(secs < WAIT_TIME){
-            char davka[1800];
-            for(int i = index; i < index+davka_len; i++){
-                davka[i] = bytes[i];
-            }
-
-            write(socket, davka, strlen(davka));
-
-            index+=davka_len;
-
-            log_msg(LOG_INFO, "%d%\n", secs+1 * 10);
-            secs++;
-            sleep(1);
-        }
-
+        log_msg(LOG_INFO, "post");
         sem_post(my_sem);
 
 
         if (fork() == 0){
             log_msg(LOG_INFO, "Disp the picture\n");
 
-            execl("display", "-update" , "1" , "out.png", "&", nullptr);
-            exit(2);
+            execl("display", "display", "-update" , "1" , "out.png", "&", nullptr);
+            // exit(2);
         }
+        wait(NULL);
 
     }
 }
@@ -383,7 +351,7 @@ void handleConvert(int socket, std::vector<char*> args){
     int arg_len = args.size();
     argv[arg_len] = nullptr;
 
-    log_msg(LOG_INFO, "Made the picture\n");
+    log_msg(LOG_INFO, "Made the picture");
     
     int convert_len = execvp(argv[0], argv);
     if ( convert_len < 0 ){
@@ -396,4 +364,51 @@ std::string handleInput(int hours, int minutes){
     int desc = (minutes/10) * 10;
     // sprintf()
     return "hey";
+}
+
+void sendData(int socket){
+        
+        int secs = 0;
+
+
+        int out_fd = open("out.png", O_RDONLY);
+        struct stat fileStat;
+        if(stat("out.png", &fileStat) == -1){
+            log_msg(LOG_ERROR, "SOUBOR NENI");
+            exit(2);
+        }
+        int file_size = fileStat.st_size + 100;
+        
+        char bytes[file_size];
+        int file_len = read(out_fd, bytes, sizeof(bytes));
+        if ( file_len < 0 ){
+            log_msg( LOG_ERROR, "FILE OPEN FAILED" );
+            exit(0);
+        }
+
+        log_msg(LOG_INFO, "File len%d\n", file_len);    
+        log_msg(LOG_INFO, bytes);
+
+        int davka_len = (int)((float)file_len / 10);
+        int index = 0;
+
+        log_msg(LOG_INFO, "davka: %d", davka_len);    
+
+    
+        while(secs < WAIT_TIME){
+            char davka[davka_len];
+            for(int i = 0; i < davka_len; i++){
+                davka[i] = bytes[index + i];
+            }
+            davka[davka_len] = 0;
+            log_msg(LOG_INFO, davka);
+
+            write(socket, davka, strlen(davka));
+
+            index+=davka_len;
+
+            log_msg(LOG_INFO, "%d%\n", (secs+1) * 10);
+            secs++;
+            sleep(1);
+        }
 }
