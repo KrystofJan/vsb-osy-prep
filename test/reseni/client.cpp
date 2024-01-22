@@ -196,27 +196,21 @@ void handle(int socket){
         }
 
         write(socket, buf_time, len_time);
-        struct stat fileStat;
-        if(stat("out.png", &fileStat) == -1){
-            log_msg(LOG_ERROR, "SOUBOR NENI");
-            exit(2);
-        }
-        int file_size = fileStat.st_size + 1;
 
-        int fd = open("result.png", O_WRONLY | O_CREAT, 0666);
+        int fd = open("time.png", O_WRONLY | O_CREAT, 0666);
 
         while(1){              
-
-            char file_data[file_size];
+            char file_data[8430];
             int file_ee = read(socket, file_data,sizeof(file_data));
+            
             if (file_ee <= 0){
                 log_msg(LOG_ERROR, "Nelze cist ze serveru!");
                 break;
             }
 
-            log_msg(LOG_INFO, file_data);
+            file_data[file_ee] = 0;
 
-            write(fd, file_data, file_size);
+            write(fd, file_data, file_ee);
         }
 
         close(fd);

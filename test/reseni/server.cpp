@@ -39,6 +39,7 @@
 #define WAIT_TIME   10
 #define OUTPUT_PATH "out.png"
 #define SEM_NAME "/my_sem"
+#define BATCH_SIZE 10
 
 //***************************************************************************
 // log messages
@@ -301,12 +302,12 @@ void handleClient(int socket){
         char hour_buf[4];
         int desc = ((hour * 100) + ((minute/10) * 10))%1200;
 
-        char arg_buf[64];
+        char arg_buf[128];
         if (width > 0 && height > 0){
-            sprintf(arg_buf, "convert img/ring.png img/%04d.png img/minute%d.png -layers flatten -resize %dx%d! -colorspace Gray out.png", desc, minute, width, height);
+            sprintf(arg_buf, "convert img/ring.png img/%04d.png img/minute%02d.png -layers flatten -resize %dx%d! -colorspace Gray out.png", desc, minute, width, height);
         }
         else{
-            sprintf(arg_buf, "convert img/ring.png img/hour%04d.png img/minute%d.png -layers flatten -colorspace Gray out.png", desc, minute);
+            sprintf(arg_buf, "convert img/ring.png img/hour%04d.png img/minute%02d.png -layers flatten -colorspace Gray out.png", desc, minute);
         }
 
         log_msg(LOG_INFO, arg_buf);
@@ -385,32 +386,26 @@ void sendData(int socket){
             log_msg( LOG_ERROR, "FILE OPEN FAILED" );
             exit(0);
         }
+
         bytes[file_size] = 0;
-        write(socket, bytes, strlen(bytes));
+        // write(socket, bytes, file_size);
 
-        // log_msg(LOG_INFO, "File len%d\n", file_len);    
-        // log_msg(LOG_INFO, bytes);
+        int davka_len = (int)((float)file_len / BATCH_SIZE);
+        int index = 0;
 
-//         int davka_len = (int)((float)file_len / 10);
-//         int index = 0;
+        while(secs < WAIT_TIME){
+            char davka[davka_len];
+            for(int i = 0; i < davka_len; i++){
+                davka[i] = bytes[index + i];
+            }
+            davka[davka_len] = 0;
 
-//         log_msg(LOG_INFO, "davka: %d", davka_len);    
+            write(socket, davka, davka_len);
 
-    
-//         while(secs < WAIT_TIME){
-//             char davka[davka_len];
-//             for(int i = 0; i < davka_len; i++){
-//                 davka[i] = bytes[index + i];
-//             }
-//             davka[davka_len] = 0;
-//             log_msg(LOG_INFO, davka);
+            index+=davka_len;
 
-//             write(socket, davka, strlen(davka));
-
-//             index+=davka_len;
-
-//             log_msg(LOG_INFO, "%d%\n", (secs+1) * 10);
-//             secs++;
-//             sleep(1);
-//         }
+            log_msg(LOG_INFO, "%d%", (secs+1) * 10);
+            secs++;
+            sleep(1);
+        }
 }
