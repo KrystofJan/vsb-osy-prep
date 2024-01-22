@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <netdb.h>
+#include <sys/stat.h>
 
 #define STR_CLOSE               "close"
 
@@ -196,29 +197,22 @@ void handle(int socket){
 
         write(socket, buf_time, len_time);
 
-        char buf_out[254];
-        int len_out = read(socket,buf_out, sizeof(buf_out));
-
-        if (len_out < 0){
-            log_msg(LOG_ERROR, "Nelze cist ze serveru!");
-        }
-        
-        int fd = open("result.png", O_WRONLY | O_CREAT, 0666);
+        int fd = open("time.png", O_WRONLY | O_CREAT, 0666);
 
         while(1){              
-
-            char file_data[1800];
+            char file_data[8430];
             int file_ee = read(socket, file_data,sizeof(file_data));
-
+            
             if (file_ee <= 0){
                 log_msg(LOG_ERROR, "Nelze cist ze serveru!");
                 break;
             }
 
-            log_msg(LOG_INFO, file_data);
+            file_data[file_ee] = 0;
 
             write(fd, file_data, file_ee);
         }
+
         close(fd);
     }
 }
