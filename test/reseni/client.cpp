@@ -203,11 +203,13 @@ void handle(int socket){
             char file_data[8430];
             int file_ee = read(socket, file_data,sizeof(file_data));
             
-            if (file_ee <= 0){
+            if (file_ee < 0){
                 log_msg(LOG_ERROR, "Nelze cist ze serveru!");
                 break;
             }
 
+            //if is ack then break and repeat...
+            
             file_data[file_ee] = 0;
 
             write(fd, file_data, file_ee);

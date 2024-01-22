@@ -38,8 +38,9 @@
 #define STR_QUIT    "quit"
 #define WAIT_TIME   10
 #define OUTPUT_PATH "out.png"
-#define SEM_NAME "/my_sem"
-#define BATCH_SIZE 10
+#define ACK         "ACK\0"
+#define SEM_NAME    "/my_sem"
+#define BATCH_SIZE  10
 
 //***************************************************************************
 // log messages
@@ -408,4 +409,6 @@ void sendData(int socket){
             secs++;
             sleep(1);
         }
+
+        write(socket, ACK, strlen(ACK))
 }
