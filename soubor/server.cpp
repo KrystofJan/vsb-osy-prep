@@ -33,6 +33,7 @@
 
 #define STR_CLOSE   "close"
 #define STR_QUIT    "quit"
+#define SEM_NAME    "/my_mutex"
 #define ACK         "ACK\0"
 
 //***************************************************************************
@@ -46,7 +47,7 @@ std::vector<std::thread> allClients;
 // debug flag
 int g_debug = LOG_INFO;
 
-sem_t mutex;
+sem_t *mutex = nullptr;
 
 void handleClient(int socket);
 void log_msg( int t_log_level, const char *t_form, ... )
@@ -109,7 +110,8 @@ int main( int t_narg, char **t_args )
 
     int l_port = 0;
 
-    sem_init(&mutex, 1, 1); 
+    // sem_init(&mutex, 1, 1); 
+    mutex = sem_open(SEM_NAME, O_RDWR)
 
     // parsing arguments
     for ( int i = 1; i < t_narg; i++ )

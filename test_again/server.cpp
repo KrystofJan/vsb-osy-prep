@@ -27,14 +27,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
-#include <semaphore.h>
-#include <fcntl.h>           /* For O_* constants */
-#include <sys/stat.h>        /* For mode constants */
+#include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
-#include <string.h>
-#include <sys/wait.h>
-#include <string>
+#include <sys/stat.h>
+#include <semaphore.h>
 
 #define STR_CLOSE   "close"
 #define STR_QUIT    "quit"
@@ -45,22 +42,20 @@
 #define LOG_ERROR               0       // errors
 #define LOG_INFO                1       // information and notifications
 #define LOG_DEBUG               2       // debug messages
-char* reply = 
-            "HTTP/1.1 200 OK\n"
-            "Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
-            "Server: Apache/2.2.3\n"
-            "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
-            "ETag: \"56d-9989200-1132c580\"\n"
-            "Content-Type: text/html\n"
-            "Content-Length: 15\n"
-            "Accept-Ranges: bytes\n"
-            "Connection: close\n"
-            "\n";
+
+
+#define BATCH_SIZE 2048
+#define EOF "EOF\0"
+#define SEM "/my_sem"
 
 // debug flag
 int g_debug = LOG_INFO;
+sem_t *my_sem = nullptr;
 
-sem_t mutex;
+void clientHandle(int socket);
+bool inputHandle(int socket, char* args);
+void convert(char* args_buf);
+void sendPicToClient(int socket, char* filename);
 
 void log_msg( int t_log_level, const char *t_form, ... )
 {
@@ -112,11 +107,16 @@ void help( int t_narg, char **t_args )
 
     if ( !strcmp( t_args[ 1 ], "-d" ) )
         g_debug = LOG_DEBUG;
+
+    if ( !strcmp( t_args[ 1 ], "-r" ) )
+    {
+        log_msg( LOG_INFO, "Clean semaphores." );
+        sem_unlink(SEM);
+        exit( 0 );
+    }
 }
 
 //***************************************************************************
-
-void handleClient(int socket);
 
 int main( int t_narg, char **t_args )
 {
@@ -132,6 +132,7 @@ int main( int t_narg, char **t_args )
 
         if ( !strcmp( t_args[ i ], "-h" ) )
             help( t_narg, t_args );
+            
 
         if ( *t_args[ i ] != '-' && !l_port )
         {
@@ -140,7 +141,7 @@ int main( int t_narg, char **t_args )
         }
     }
 
-    sem_init(&mutex, 1, 1);
+    my_sem = sem_open(SEM, O_RDWR | O_CREAT, 0660, 1);
 
     if ( l_port <= 0 )
     {
@@ -253,6 +254,7 @@ int main( int t_narg, char **t_args )
                 log_msg( LOG_INFO, "Client IP: '%s'  port: %d",
                                  inet_ntoa( l_srv_addr.sin_addr ), ntohs( l_srv_addr.sin_port ) );
 
+                
                 break;
             }
 
@@ -261,53 +263,133 @@ int main( int t_narg, char **t_args )
         // change source from sock_listen to sock_client
         l_read_poll[ 1 ].fd = l_sock_client;
 
-
-        if (fork() == 0 ) {
-            handleClient(l_sock_client);
+        if(fork() == 0){
+            clientHandle(l_sock_client);
         }
+        wait(NULL);
     } // while ( 1 )
 
     return 0;
 }
 
-void handleClient(int socket){
-    char buf[256];
-    int len = read(socket, buf, sizeof(buf));
+bool inputHandle(int socket, char* args) {
+    int hour = 0;
+    int minute = 0;
+    int width = 0;
+    int height = 0;
 
-    if(len < 0){
-        log_msg(LOG_ERROR, "Cannot read from socket!\n");
-        exit(0);
+    char time_buf[64];
+    int time_len = read(socket, time_buf, sizeof(time_buf));
+    if (time_len < 0) {
+        log_msg(LOG_ERROR, "Cannot process input!");
+        exit(2);
     }
 
-    char request[128];
-    sscanf(buf, "GET %s HTTP", &request);
+    sscanf(time_buf, "TIME %d:%d SIZE %dx%d", &hour, &minute, &width, &height);
 
-    std::vector<char *> args;
+    if (hour == 0 && minute == 0){
+        return false;
+    }
     
-    std::string req = std::string(request).substr(1, strlen(request));
+    int real_hour = ((hour * 100) + ((minute / 10) * 10))%1200; 
+    
+    if (width == 0 && height == 0){
+        sprintf(args, "convert img/ring.png img/hour%04d.png img/minute%02d.png -layers flatten out.png", real_hour, minute);
+        return true;
+    }
 
-    char* token = strtok(req.c_str(), "*");
-    // memmove(token, token+1, strlen(token));
-    while(token != NULL){
+    sprintf(args, "convert img/ring.png img/hour%04d.png img/minute%02d.png -layers flatten -resize %dx%d! out.png", real_hour, minute, width, height);
+    return true;
+
+}
+
+void convert(char* args_buf){
+    std::vector<char*> args;
+
+    char* token = strtok(args_buf, " ");
+    while(token != nullptr){
         args.push_back(token);
-        token = strtok(NULL, "*");
+        token = strtok(NULL, " ");
     }
 
-    char **argsv = args.data();
+    char **argv = args.data();
+    int argv_len = args.size();
+    argv[argv_len] = nullptr;
 
-    for(char* c : args){
-        log_msg(LOG_INFO, c);
-    }
-
-    write(socket, reply, strlen(reply));
-
-    dup2(STDOUT_FILENO, socket);
     if (fork() == 0){
-        execvp(argsv[0], argsv);
+        execvp(argv[0], argv);
     }
 
     wait(NULL);
+}
 
-    close( socket );
-    exit( 0 );
+void sendPicToClient(int socket, char* filename){
+    int fd = open(filename, O_RDONLY, 0666);
+    
+    if (fd < 0) {
+        log_msg(LOG_ERROR, "FILE DOES NOT EXIST!");
+        exit(EXIT_FAILURE);
+    }
+
+    struct stat fileStat;
+    if(stat(filename, &fileStat) == -1){
+        log_msg(LOG_ERROR, "FILE DOES NOT EXIST!");
+        exit(EXIT_FAILURE);
+    }
+    int file_len = fileStat.st_size;
+
+    char file_full[file_len];
+    int len_f = read(fd, file_full, sizeof(file_full));
+    if(len_f < 0) {
+        log_msg(LOG_ERROR, "Could not read from the file!");
+        exit(EXIT_FAILURE);
+    }
+
+    int index = 0;
+    int size = BATCH_SIZE;
+    while(true){
+
+        if(index + BATCH_SIZE > file_len){
+            size = file_len - index;
+        }
+
+        char batch_buf[size];
+        
+        for(int i = 0; i < size; i++){
+            batch_buf[i] = file_full[index + i];
+        }
+
+        write(socket, batch_buf, size);
+
+        index += size;
+        log_msg(LOG_INFO, "%d \%", 100*index / file_len);
+
+        if(size != BATCH_SIZE){
+            break;
+        }
+        sleep(1);
+    }
+
+    write(socket, EOF, strlen(EOF));
+}
+
+void clientHandle(int socket){
+    char args_buf[256];
+    
+    if (!inputHandle(socket, args_buf)){
+        log_msg(LOG_ERROR ,"WRONG INPUT exiting!");
+        exit(1);
+    }
+
+    log_msg(LOG_INFO, "DOWN");
+    sem_wait(my_sem);
+
+    convert(args_buf);
+
+    sendPicToClient(socket, "out.png");
+
+    log_msg(LOG_INFO, "UP");
+    sem_post(my_sem);
+
+    exit(EXIT_SUCCESS);
 }

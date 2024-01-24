@@ -299,8 +299,6 @@ void handleClient1(int socket)
 
     while(1){
         if(counter > 3) {
-            
-
             sem_post(&sem_two);
             sem_wait(&sem_one);
             log_msg(LOG_INFO, "Reached the limit");
@@ -336,6 +334,7 @@ log_msg(LOG_INFO, "Client  2\n");
         if(counter > 3) {
             sem_post(&sem_three);
             sem_wait(&sem_two);
+            counter = 0;
         }
         int len = read( socket, buf, sizeof( buf ) );
         if ( len < 0 )
@@ -361,7 +360,7 @@ void handleClient3(int socket)
     char buf[128];
     int num1 = 0, num2 = 0;
     char znamenko = '/';
-log_msg(LOG_INFO, "Client 3\n");
+    log_msg(LOG_INFO, "Client 3\n");
 
 
     int counter = 0;
@@ -369,6 +368,7 @@ log_msg(LOG_INFO, "Client 3\n");
         if(counter > 3) {
             sem_post(&sem_one);
             sem_wait(&sem_three);
+            counter = 0;
         }
         int len = read( socket, buf, sizeof( buf ) );
         if ( len < 0 )
