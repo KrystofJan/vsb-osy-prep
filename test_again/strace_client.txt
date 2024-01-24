@@ -1,0 +1,114 @@
+36830 execve("./client", ["./client", "localhost", "9999"], 0x7fff0395b0f8 /* 49 vars */) = 0
+36830 brk(NULL)                         = 0x562a070db000
+36830 arch_prctl(0x3001 /* ARCH_??? */, 0x7ffe403eb210) = -1 EINVAL (Invalid argument)
+36830 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f82a7316000
+36830 access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory)
+36830 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=92507, ...}, AT_EMPTY_PATH) = 0
+36830 mmap(NULL, 92507, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f82a72ff000
+36830 close(3)                          = 0
+36830 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+36830 read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\237\2\0\0\0\0\0"..., 832) = 832
+36830 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+36830 pread64(3, "\4\0\0\0 \0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 48, 848) = 48
+36830 pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0\244;\374\204(\337f#\315I\214\234\f\256\271\32"..., 68, 896) = 68
+36830 newfstatat(3, "", {st_mode=S_IFREG|0755, st_size=2216304, ...}, AT_EMPTY_PATH) = 0
+36830 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+36830 mmap(NULL, 2260560, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f82a7000000
+36830 mmap(0x7f82a7028000, 1658880, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x7f82a7028000
+36830 mmap(0x7f82a71bd000, 360448, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1bd000) = 0x7f82a71bd000
+36830 mmap(0x7f82a7215000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x214000) = 0x7f82a7215000
+36830 mmap(0x7f82a721b000, 52816, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f82a721b000
+36830 close(3)                          = 0
+36830 mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f82a72fc000
+36830 arch_prctl(ARCH_SET_FS, 0x7f82a72fc740) = 0
+36830 set_tid_address(0x7f82a72fca10)   = 36830
+36830 set_robust_list(0x7f82a72fca20, 24) = 0
+36830 rseq(0x7f82a72fd0e0, 0x20, 0, 0x53053053) = 0
+36830 mprotect(0x7f82a7215000, 16384, PROT_READ) = 0
+36830 mprotect(0x562a055eb000, 4096, PROT_READ) = 0
+36830 mprotect(0x7f82a7350000, 8192, PROT_READ) = 0
+36830 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+36830 munmap(0x7f82a72ff000, 92507)     = 0
+36830 newfstatat(1, "", {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0x3), ...}, AT_EMPTY_PATH) = 0
+36830 getrandom("\x3a\x91\xeb\x3b\x68\x60\x43\x5f", 8, GRND_NONBLOCK) = 8
+36830 brk(NULL)                         = 0x562a070db000
+36830 brk(0x562a070fc000)               = 0x562a070fc000
+36830 write(1, "INF: Connection to 'localhost':9"..., 37) = 37
+36830 newfstatat(AT_FDCWD, "/etc/resolv.conf", {st_mode=S_IFREG|0644, st_size=920, ...}, 0) = 0
+36830 openat(AT_FDCWD, "/etc/host.conf", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=92, ...}, AT_EMPTY_PATH) = 0
+36830 read(3, "# The \"order\" line is only used "..., 4096) = 92
+36830 read(3, "", 4096)                 = 0
+36830 close(3)                          = 0
+36830 futex(0x7f82a722232c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+36830 openat(AT_FDCWD, "/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=920, ...}, AT_EMPTY_PATH) = 0
+36830 read(3, "# This is /run/systemd/resolve/s"..., 4096) = 920
+36830 read(3, "", 4096)                 = 0
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=920, ...}, AT_EMPTY_PATH) = 0
+36830 close(3)                          = 0
+36830 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 3
+36830 connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory)
+36830 close(3)                          = 0
+36830 socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 3
+36830 connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory)
+36830 close(3)                          = 0
+36830 newfstatat(AT_FDCWD, "/etc/nsswitch.conf", {st_mode=S_IFREG|0644, st_size=553, ...}, 0) = 0
+36830 newfstatat(AT_FDCWD, "/", {st_mode=S_IFDIR|0755, st_size=4096, ...}, 0) = 0
+36830 openat(AT_FDCWD, "/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=553, ...}, AT_EMPTY_PATH) = 0
+36830 read(3, "# /etc/nsswitch.conf\n#\n# Example"..., 4096) = 553
+36830 read(3, "", 4096)                 = 0
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=553, ...}, AT_EMPTY_PATH) = 0
+36830 close(3)                          = 0
+36830 openat(AT_FDCWD, "/etc/hosts", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=200, ...}, AT_EMPTY_PATH) = 0
+36830 lseek(3, 0, SEEK_SET)             = 0
+36830 read(3, "# See `man hosts` for details.\n#"..., 4096) = 200
+36830 read(3, "", 4096)                 = 0
+36830 close(3)                          = 0
+36830 openat(AT_FDCWD, "/etc/gai.conf", O_RDONLY|O_CLOEXEC) = 3
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=2584, ...}, AT_EMPTY_PATH) = 0
+36830 newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=2584, ...}, AT_EMPTY_PATH) = 0
+36830 read(3, "# Configuration for getaddrinfo("..., 4096) = 2584
+36830 read(3, "", 4096)                 = 0
+36830 close(3)                          = 0
+36830 futex(0x7f82a72211c4, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+36830 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 3
+36830 bind(3, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0
+36830 getsockname(3, {sa_family=AF_NETLINK, nl_pid=36830, nl_groups=00000000}, [12]) = 0
+36830 sendto(3, [{nlmsg_len=20, nlmsg_type=RTM_GETADDR, nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=1706130347, nlmsg_pid=0}, {ifa_family=AF_UNSPEC, ...}], 20, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 20
+36830 recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=76, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1706130347, nlmsg_pid=36830}, {ifa_family=AF_INET, ifa_prefixlen=8, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("127.0.0.1")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("127.0.0.1")], [{nla_len=7, nla_type=IFA_LABEL}, "lo"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=4208, tstamp=4208}]]], [{nlmsg_len=88, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1706130347, nlmsg_pid=36830}, {ifa_family=AF_INET, ifa_prefixlen=24, ifa_flags=0, ifa_scope=RT_SCOPE_UNIVERSE, ifa_index=if_nametoindex("enp5s0")}, [[{nla_len=8, nla_type=IFA_ADDRESS}, inet_addr("10.0.0.243")], [{nla_len=8, nla_type=IFA_LOCAL}, inet_addr("10.0.0.243")], [{nla_len=8, nla_type=IFA_BROADCAST}, inet_addr("10.0.0.255")], [{nla_len=11, nla_type=IFA_LABEL}, "enp5s0"], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_NOPREFIXROUTE], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=72286, ifa_valid=72286, cstamp=5603, tstamp=5616}]]]], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 164
+36830 recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1706130347, nlmsg_pid=36830}, {ifa_family=AF_INET6, ifa_prefixlen=128, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_HOST, ifa_index=if_nametoindex("lo")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "::1")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=4208, tstamp=4208}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT]]], [{nlmsg_len=72, nlmsg_type=RTM_NEWADDR, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1706130347, nlmsg_pid=36830}, {ifa_family=AF_INET6, ifa_prefixlen=64, ifa_flags=IFA_F_PERMANENT, ifa_scope=RT_SCOPE_LINK, ifa_index=if_nametoindex("enp5s0")}, [[{nla_len=20, nla_type=IFA_ADDRESS}, inet_pton(AF_INET6, "fe80::3477:8d7c:1c97:c051")], [{nla_len=20, nla_type=IFA_CACHEINFO}, {ifa_prefered=4294967295, ifa_valid=4294967295, cstamp=5296, tstamp=5616}], [{nla_len=8, nla_type=IFA_FLAGS}, IFA_F_PERMANENT|IFA_F_NOPREFIXROUTE]]]], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 144
+36830 recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1706130347, nlmsg_pid=36830}, 0], iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 20
+36830 close(3)                          = 0
+36830 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC, IPPROTO_IP) = 3
+36830 connect(3, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+36830 getsockname(3, {sa_family=AF_INET, sin_port=htons(51222), sin_addr=inet_addr("127.0.0.1")}, [28 => 16]) = 0
+36830 close(3)                          = 0
+36830 socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = 3
+36830 connect(3, {sa_family=AF_INET, sin_port=htons(9999), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+36830 getsockname(3, {sa_family=AF_INET, sin_port=htons(36050), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
+36830 write(1, "INF: My IP: '127.0.0.1'  port: 3"..., 37) = 37
+36830 getpeername(3, {sa_family=AF_INET, sin_port=htons(9999), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
+36830 write(1, "INF: Server IP: '127.0.0.1'  por"..., 40) = 40
+36830 write(1, "INF: Enter 'close' to close appl"..., 41) = 41
+36830 read(0, "TIME 11:25 SIZE 64x64\n", 128) = 22
+36830 write(3, "TIME 11:25 SIZE 64x64\n", 22) = 22
+36830 openat(AT_FDCWD, "time.png", O_WRONLY|O_CREAT, 0666) = 4
+36830 read(3, "\211PNG\r\n\32\n\0\0\0\rIHDR\0\0\0@\0\0\0@\10\0\0\0\0\217\2."..., 2048) = 2048
+36830 write(4, "\211PNG\r\n\32\n\0\0\0\rIHDR\0\0\0@\0\0\0@\10\0\0\0\0\217\2."..., 2048) = 2048
+36830 read(3, "\360\25br\321\n\26$4\341%\361\27\30\31\32&'()*56789:CDEFG"..., 2048) = 2048
+36830 write(4, "\360\25br\321\n\26$4\341%\361\27\30\31\32&'()*56789:CDEFG"..., 2048) = 2048
+36830 read(3, "M\336\265\334xk]\267\361/\206\3545\233a\210\356\341\22m'%\33\272\237\241\310\374(\3V\212"..., 2048) = 2048
+36830 write(4, "M\336\265\334xk]\267\361/\206\3545\233a\210\356\341\22m'%\33\272\237\241\310\374(\3V\212"..., 2048) = 2048
+36830 read(3, "\264k\24\20\240\2164^\212\240`\n\232\212(\0\242\212(\0\242\212(\0\242\212(\0\256O\307\236"..., 2048) = 2048
+36830 write(4, "\264k\24\20\240\2164^\212\240`\n\232\212(\0\242\212(\0\242\212(\0\242\212(\0\256O\307\236"..., 2048) = 2048
+36830 read(3, "ic Domain\266\2211[\0\0\0\"tEXticc:descrip"..., 2048) = 130
+36830 write(4, "ic Domain\266\2211[\0\0\0\"tEXticc:descrip"..., 130) = 130
+36830 read(3, "EOF", 2048)              = 3
+36830 write(1, "INF: ended\n", 11)      = 11
+36830 close(3)                          = 0
+36830 exit_group(0)                     = ?
+36830 +++ exited with 0 +++
