@@ -31,6 +31,7 @@
 #include <vector>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <pthread.h>
 
 #define STR_CLOSE   "close"
 #define STR_QUIT    "quit"
@@ -49,13 +50,12 @@
 
 #define BATCH_SIZE 1024
 
-#define MY_EOF "EOF\0"
+#define MY_EOF "EOF"
 
 // debug flag
 int g_debug = LOG_INFO;
 
 std::vector<std::thread> allClients;
-
 
 void handle(int socket);
 void handleLs(int socket);
@@ -123,11 +123,11 @@ int main( int t_narg, char **t_args )
 
     int l_port = 0;
 
-    int pipe = mkfifo(PIPE_NAME, O_CREAT);
-    if (pipe < 0){
-        log_msg(LOG_ERROR, "Could not create a pipe");
-        exit(EXIT_FAILURE);
-    }
+    // int pipe = mkfifo(PIPE_NAME, O_CREAT);
+    // if (pipe < 0){
+    //     log_msg(LOG_ERROR, "Could not create a pipe");
+    //     exit(EXIT_FAILURE);
+    // }
 
     // parsing arguments
     for ( int i = 1; i < t_narg; i++ )
@@ -265,8 +265,6 @@ int main( int t_narg, char **t_args )
         l_read_poll[ 1 ].fd = l_sock_client;
         
         allClients.push_back(std::thread(handle, l_sock_client));
-
-
     } // while ( 1 )
 
     for(std::thread &client : allClients){
@@ -279,7 +277,7 @@ int main( int t_narg, char **t_args )
 void handleLs(int socket){
     if(fork() == 0){
         dup2(socket, STDOUT_FILENO);
-        execlp("ls", "ls", nullptr);
+        execlp("ls", "ls", "input" , nullptr);
         exit(1);
     }
     wait(NULL);
@@ -322,15 +320,8 @@ void recievePIDFromPipe(){
 void handleShow(int socket){
     if (fork() == 0){
         sendPIDToPipe();
-        
     }
-
-
-
-
     
-
-
 }
 
 void handlePut(int socket){
@@ -368,15 +359,17 @@ void handleGet(int socket, char *img){
         }
 
         write(socket, barch, size);
-
-        if (size != BATCH_SIZE) break;
         index += size;
+        if (size != BATCH_SIZE) break;
     }
-
-    write(socket, MY_EOF, sizeof(MY_EOF));
+    sleep(1);
+    log_msg(LOG_INFO, "ENDE");
+    write(socket, MY_EOF, strlen(MY_EOF));
 }
 
 void handle(int socket){
+    log_msg( LOG_INFO, "Unable to read from socket!" );
+
     char input_buf[128];
     int input_len = read(socket, input_buf, sizeof(input_buf));
 

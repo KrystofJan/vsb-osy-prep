@@ -227,8 +227,9 @@ void handleGet(int socket){
             log_msg(LOG_ERROR, "Could not read form the socket!");
             exit(EXIT_FAILURE);
         }
+        batch[batch_len] = 0;
 
-        if (!strcmp(batch, MY_EOF)){
+        if (!strcasecmp(batch, MY_EOF)){
             break;
         }
 
