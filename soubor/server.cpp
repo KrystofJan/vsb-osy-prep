@@ -35,6 +35,7 @@
 #define STR_QUIT    "quit"
 #define SEM_NAME    "/my_mutex"
 #define ACK         "ACK\0"
+#define WAIT_TIME   1
 
 //***************************************************************************
 // log messages
@@ -111,7 +112,7 @@ int main( int t_narg, char **t_args )
     int l_port = 0;
 
     // sem_init(&mutex, 1, 1); 
-    mutex = sem_open(SEM_NAME, O_RDWR)
+    mutex = sem_open(SEM_NAME, O_RDWR, 0666, 1);
 
     // parsing arguments
     for ( int i = 1; i < t_narg; i++ )
@@ -263,7 +264,7 @@ void handleClient(int socket){
 
         char buf[256];
 
-        sem_wait(&mutex);
+        sem_wait(mutex);
 
         int len = read(socket, buf, sizeof(buf));
 
@@ -296,6 +297,6 @@ void handleClient(int socket){
         }
 
         write(STDOUT_FILENO, buf_file_raw, read_fd);
-        sem_post(&mutex);
+        sem_post(mutex);
     }
 }

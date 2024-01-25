@@ -45,6 +45,7 @@
 #define CMD_SHOW "show"
 #define CMD_GET "get"
 #define CMD_PUT "put"
+#define PIPE_NAME "/my_pipe"
 
 #define BATCH_SIZE 1024
 
@@ -121,6 +122,12 @@ int main( int t_narg, char **t_args )
     if ( t_narg <= 1 ) help( t_narg, t_args );
 
     int l_port = 0;
+
+    int pipe = mkfifo(PIPE_NAME, O_CREAT);
+    if (pipe < 0){
+        log_msg(LOG_ERROR, "Could not create a pipe");
+        exit(EXIT_FAILURE);
+    }
 
     // parsing arguments
     for ( int i = 1; i < t_narg; i++ )
@@ -277,8 +284,53 @@ void handleLs(int socket){
     }
     wait(NULL);
 }
+
+void sendPIDToPipe(){
+    int pipe = open(PIPE_NAME, O_WRONLY, 0666);
+    if (pipe < 0){
+        log_msg(LOG_ERROR, "Could not open pipe!");
+        exit(EXIT_FAILURE);
+    }
+    char pid_buf[8];
+    sscanf(pid_buf, "%d", getpid());
+    pid_buf[8] = 0;
+    write(pipe, pid_buf, strlen(pid_buf));
+}
+
+void recievePIDFromPipe(){
+    int pipe = open(PIPE_NAME, O_RDONLY, 0666);
+    if (pipe < 0){
+        log_msg(LOG_ERROR, "Could not open pipe!");
+        exit(EXIT_FAILURE);
+    }
+
+    char pid_buf[8];
+    int pid_len = read(pipe, pid_buf, sizeof(pid_buf));
+    if (pipe < 0){
+        log_msg(LOG_ERROR, "Could not open pipe!");
+        exit(EXIT_FAILURE);
+    }
+
+    pid_buf[8] = 0;
+
+    int pid = -1;
+    sprintf(pid_buf, "%d", pid);
+    // TODO WHAT THE FUCK !
+    kill(pid, SIGKILL);
+}
+
 void handleShow(int socket){
-    log_msg(LOG_INFO, "handeling show");
+    if (fork() == 0){
+        sendPIDToPipe();
+        
+    }
+
+
+
+
+    
+
+
 }
 
 void handlePut(int socket){
@@ -350,7 +402,7 @@ void handle(int socket){
     }
     
     else if ( !strcmp( cmd, CMD_GET ) ){
-        handleGet(socket, args);
+        handleGet(socket, "error.png");
     }
 
     else{

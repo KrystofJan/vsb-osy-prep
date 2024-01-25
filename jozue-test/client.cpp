@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <netdb.h>
+#include <fcntl.h>
 
 #define STR_CLOSE               "close"
 

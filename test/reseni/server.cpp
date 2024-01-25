@@ -410,5 +410,5 @@ void sendData(int socket){
             sleep(1);
         }
 
-        write(socket, ACK, strlen(ACK))
+        write(socket, ACK, strlen(ACK));
 }
